@@ -132,3 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # custom user model
 AUTH_USER_MODEL = 'movies.CustomUser'
+
+# movie api key
+OMDB_API_KEY = os.environ.get("OMDB_API_KEY")
