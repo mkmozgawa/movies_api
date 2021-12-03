@@ -1,4 +1,3 @@
-import json
 import pytest
 
 from movies.models import Movie
@@ -21,6 +20,7 @@ def test_add_movie(client):
     assert resp.data['genre']
     assert resp.data['year']
     assert resp.data['runtime']
+    assert resp.data['body']
 
     movies = Movie.objects.all()
     assert len(movies) == 1
@@ -37,7 +37,7 @@ def test_add_movie_with_missing_data(client):
         content_type='application/json'
     )
     assert resp.status_code == 400
-    assert resp.data['Error'] == 'Movie title missing, please add one like this: {"title": "your title"} and try again.'
+    assert resp.data['Error'] == 'Could not fetch movie data, please change your query and try again.'
 
     movies = Movie.objects.all()
     assert len(movies) == 0

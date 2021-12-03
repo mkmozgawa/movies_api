@@ -6,7 +6,8 @@ def test_valid_movie_serializer():
         'title': 'Matrix',
         'genre': 'Action, Drama, Fantasy',
         'year': '1993',
-        'runtime': '60 min'
+        'runtime': '60 min',
+        'body': {},
     }
     serializer = MovieSerializer(data=valid_serializer_data)
     assert serializer.is_valid()
@@ -20,4 +21,4 @@ def test_invalid_movie_serializer():
     serializer = MovieSerializer(data=invalid_serializer_data)
     assert not serializer.is_valid()
     assert serializer.validated_data == {}
-    # assert serializer.errors == {'title': ['This field is required']}
+    assert serializer.errors['title']

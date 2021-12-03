@@ -135,3 +135,4 @@ AUTH_USER_MODEL = 'movies.CustomUser'
 
 # movie api key
 OMDB_API_KEY = os.environ.get("OMDB_API_KEY")
+OMDB_API_URL = os.environ.get("OMDB_API_URL")
