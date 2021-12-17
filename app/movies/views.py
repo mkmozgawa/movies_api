@@ -5,9 +5,17 @@ from rest_framework.views import APIView
 
 from .adapters import OMDBApiAdapter
 from .serializers import MovieSerializer
+from .models import Movie
 
 
 class MovieList(APIView):
+    def get(self, request, format=None):
+        movies = Movie.objects.all()
+        if genre := self.request.query_params.get('genre'):
+            movies = movies.filter(genre=genre)
+        serializer = MovieSerializer(movies, many=True)
+        return Response(serializer.data)
+
     def post(self, request, format=None):
         try:
             api_data = OMDBApiAdapter().get_movie_data(request.data['title'])

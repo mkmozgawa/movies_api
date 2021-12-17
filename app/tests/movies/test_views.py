@@ -11,12 +11,12 @@ def test_add_movie(client):
     resp = client.post(
         '/movies/',
         {
-            'title': 'Matrix',
+            'title': 'The Matrix',
         },
         content_type='application/json'
     )
     assert resp.status_code == 201
-    assert resp.data['title'] == 'Matrix'
+    assert resp.data['title'] == 'The Matrix'
     assert resp.data['genre']
     assert resp.data['year']
     assert resp.data['runtime']
@@ -65,10 +65,28 @@ def test_add_movie_with_nonexistent_title(client):
 def test_add_movie_other_user_provided_parameters_are_ignored(client):
     resp = client.post(
         '/movies/',
-        {'title': 'Matrix',
+        {'title': 'The Matrix',
          'year': '2030'},
         content_type='application/json'
     )
     assert resp.status_code == 201
-    assert resp.data['title'] == 'Matrix'
-    assert resp.data['year'] != '2030'
+    assert resp.data['title'] == 'The Matrix'
+    assert resp.data['year'] != 'The 2030'
+
+
+@pytest.mark.django_db
+def test_list_all_movies(client, add_movie):
+    first_movie = add_movie(title='The Matrix', genre='sci-fi', year='1999', runtime='150 min', body={})
+    second_movie = add_movie(title='The Witcher', genre='fantasy', year='2019-', runtime='60min', body={})
+    resp = client.get(f'/movies/')
+    assert resp.data[0]['title'] == first_movie.title
+    assert resp.data[1]['title'] == second_movie.title
+
+
+@pytest.mark.django_db
+def test_list_of_all_movies_can_be_filtered_by_genre(client, add_movie):
+    first_movie = add_movie(title='The Matrix', genre='sci-fi', year='1999', runtime='150 min', body={})
+    second_movie = add_movie(title='The Witcher', genre='fantasy', year='2019-', runtime='60min', body={})
+    resp = client.get(f'/movies/?genre=fantasy')
+    assert len(resp.data) == 1
+    assert resp.data[0]['title'] == second_movie.title

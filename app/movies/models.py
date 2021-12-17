@@ -11,7 +11,7 @@ class CustomUser(AbstractUser):
 class Movie(models.Model):
     title = models.CharField(max_length=255, null=False, blank=False)
     genre = models.CharField(max_length=255)
-    year = models.CharField(max_length=4)
+    year = models.CharField(max_length=9)
     runtime = models.CharField(max_length=10)
     body = models.JSONField(max_length=4096, null=True)
     created_date = models.DateTimeField(auto_now_add=True)

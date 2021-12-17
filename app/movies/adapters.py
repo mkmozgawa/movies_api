@@ -13,7 +13,7 @@ class OMDBApiAdapter:
         if 'Error' in response.keys():
             raise KeyError
         movie_data = {'title': response['Title'],
-                      'genre': response['Genre'],
+                      'genre': response['Genre'].split(',')[0],
                       'year': response['Year'],
                       'runtime': response['Runtime'],
                       'body': response
