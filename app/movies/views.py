@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 
 from .adapters import OMDBApiAdapter
 from .serializers import MovieSerializer, MovieCommentSerializer
-from .models import Movie
+from .models import Movie, MovieComment
 
 
 class MovieList(APIView):
@@ -32,6 +32,13 @@ class MovieList(APIView):
 
 
 class MovieCommentList(APIView):
+    def get(self, request, format=None):
+        comments = MovieComment.objects.all()
+        if movie_id := self.request.query_params.get('movie_id'):
+            comments = comments.filter(movie_id=movie_id)
+        serializer = MovieCommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
     def post(self, request, format=None):
         serializer = MovieCommentSerializer(data=request.data)
         if serializer.is_valid():

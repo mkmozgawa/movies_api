@@ -136,3 +136,21 @@ def test_comment_is_not_added_if_no_movie_id_is_provided(client, add_movie):
     )
     assert resp.status_code == 400
     assert resp.data['movie_id'][0] == 'This field is required.'
+
+
+@pytest.mark.django_db
+def test_list_all_comments(client, add_comment):
+    first_comment = add_comment(text='First movie comment', movie_id=1)
+    second_comment = add_comment(text='Second movie comment', movie_id=2)
+    resp = client.get(f'/comments/')
+    assert resp.data[0]['text'] == first_comment.text
+    assert resp.data[1]['text'] == second_comment.text
+
+
+@pytest.mark.django_db
+def test_list_all_comments(client, add_comment):
+    first_comment = add_comment(text='First movie comment', movie_id=1)
+    second_comment = add_comment(text='Second movie comment', movie_id=2)
+    resp = client.get(f'/comments/?movie_id=1')
+    assert len(resp.data) == 1
+    assert resp.data[0]['text'] == first_comment.text
