@@ -50,7 +50,9 @@ def test_add_movie_with_nonexistent_title(client):
 
     resp = client.post(
         '/movies/',
-        {'title': 'ac2mc2cd9s0mc010c'},
+        {
+            'title': 'ac2mc2cd9s0mc010c'
+        },
         content_type='application/json'
     )
     assert resp.status_code == 400
@@ -65,8 +67,10 @@ def test_add_movie_with_nonexistent_title(client):
 def test_add_movie_other_user_provided_parameters_are_ignored(client):
     resp = client.post(
         '/movies/',
-        {'title': 'The Matrix',
-         'year': '2030'},
+        {
+            'title': 'The Matrix',
+            'year': '2030'
+        },
         content_type='application/json'
     )
     assert resp.status_code == 201
@@ -90,3 +94,45 @@ def test_list_of_all_movies_can_be_filtered_by_genre(client, add_movie):
     resp = client.get(f'/movies/?genre=fantasy')
     assert len(resp.data) == 1
     assert resp.data[0]['title'] == second_movie.title
+
+
+@pytest.mark.django_db
+def test_comment_can_be_added(client, add_movie):
+    movie = add_movie(title='The Matrix', genre='sci-fi', year='1999', runtime='150 min', body={})
+    resp = client.post(
+        '/comments/',
+        {
+            'text': 'Great movie :chefskiss:',
+            'movie_id': movie.id
+        },
+        content_type='application/json'
+    )
+    assert resp.status_code == 201
+    assert resp.data['text'] == 'Great movie :chefskiss:'
+
+
+@pytest.mark.django_db
+def test_comment_is_not_added_if_no_text_is_provided(client, add_movie):
+    movie = add_movie(title='The Matrix', genre='sci-fi', year='1999', runtime='150 min', body={})
+    resp = client.post(
+        '/comments/',
+        {
+            'movie_id': movie.id
+        },
+        content_type='application/json'
+    )
+    assert resp.status_code == 400
+    assert resp.data['text'][0] == 'This field is required.'
+
+
+@pytest.mark.django_db
+def test_comment_is_not_added_if_no_movie_id_is_provided(client, add_movie):
+    resp = client.post(
+        '/comments/',
+        {
+            'text': 'Great movie :chefskiss:'
+        },
+        content_type='application/json'
+    )
+    assert resp.status_code == 400
+    assert resp.data['movie_id'][0] == 'This field is required.'

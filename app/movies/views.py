@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .adapters import OMDBApiAdapter
-from .serializers import MovieSerializer
+from .serializers import MovieSerializer, MovieCommentSerializer
 from .models import Movie
 
 
@@ -25,6 +25,15 @@ class MovieList(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = MovieSerializer(data=api_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MovieCommentList(APIView):
+    def post(self, request, format=None):
+        serializer = MovieCommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
